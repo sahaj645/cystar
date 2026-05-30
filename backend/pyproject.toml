@@ -1,0 +1,50 @@
+[project]
+name = "cystar-backend"
+version = "1.0.0"
+description = "CyStar Selective Disclosure & Verification backend"
+authors = [{ name = "Sahaj Gaur", email = "sahajgaur2005@gmail.com" }]
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "fastapi==0.115.5",
+    "uvicorn[standard]==0.32.1",
+    "sqlalchemy==2.0.36",
+    "pydantic==2.10.3",
+    "pydantic-settings==2.7.0",
+    "python-jose[cryptography]==3.3.0",
+    "passlib[bcrypt]==1.7.4",
+    "bcrypt==4.0.1",
+    "pynacl==1.5.0",
+    "python-multipart==0.0.20",
+    "slowapi==0.1.9",
+    "email-validator==2.2.0",
+    "qrcode[pil]==8.0",
+    "httpx==0.28.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.4",
+    "pytest-asyncio==0.24.0",
+    "pytest-cov==6.0.0",
+    "ruff==0.8.4",
+    "mypy==1.13.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "S", "C4"]
+ignore = ["S101"]  # allow asserts in tests
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
