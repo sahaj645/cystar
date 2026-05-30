@@ -116,6 +116,10 @@ See [`docs/api.md`](./docs/api.md) for the full reference. Quick summary:
 - **Salted claim hashes** prevent rainbow-table attacks on low-entropy claims.
 - **Issuer key never leaves the backend.** Holders receive credentials, not signing material.
 - **Time-limited share tokens** (configurable, default 15 min).
+- **Mock Aadhaar Face Authentication** gates the share action — captures a live
+  camera frame and simulates a UIDAI biometric match before issuing the share
+  link. Clearly labelled as a demo; production would POST the frame to UIDAI's
+  Aadhaar Face Authentication API.
 
 ---
 

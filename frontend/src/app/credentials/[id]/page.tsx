@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Eye, EyeOff, KeyRound, Share2 } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, KeyRound, ScanFace, Share2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ShareDialog } from "@/components/features/share-dialog";
+import { FaceAuthDialog } from "@/components/features/face-auth-dialog";
 import { useRequireAuth } from "@/lib/auth";
 import { formatDateTime, shortHash } from "@/lib/utils";
 
@@ -43,6 +44,8 @@ export default function CredentialDetailPage() {
   const [expiryMinutes, setExpiryMinutes] = useState("15");
   const [submitting, setSubmitting] = useState(false);
   const [share, setShare] = useState<ShareResponse | null>(null);
+  const [faceVerified, setFaceVerified] = useState(false);
+  const [faceAuthOpen, setFaceAuthOpen] = useState(false);
 
   useEffect(() => {
     if (!params?.id) return;
@@ -68,11 +71,12 @@ export default function CredentialDetailPage() {
     });
   };
 
-  const onShare = async () => {
-    if (!credential || selected.size === 0) {
-      toast.error("select at least one field to share");
-      return;
-    }
+  /**
+   * Perform the actual share API call. Should only be invoked after the
+   * holder has cleared face authentication.
+   */
+  const performShare = async () => {
+    if (!credential) return;
     setSubmitting(true);
     try {
       const res = await api.share({
@@ -86,6 +90,32 @@ export default function CredentialDetailPage() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  /**
+   * Entry point for the "Generate share link" button. Enforces field
+   * selection, then gates the actual share on Aadhaar face authentication.
+   * Once the holder has cleared face auth in this session we don't ask again.
+   */
+  const onShare = async () => {
+    if (!credential || selected.size === 0) {
+      toast.error("select at least one field to share");
+      return;
+    }
+    if (!faceVerified) {
+      setFaceAuthOpen(true);
+      return;
+    }
+    await performShare();
+  };
+
+  /**
+   * Called by FaceAuthDialog on successful biometric match. Latches
+   * verification for the rest of the session and proceeds with the share.
+   */
+  const onFaceVerified = () => {
+    setFaceVerified(true);
+    void performShare();
   };
 
   if (loading) {
@@ -133,9 +163,16 @@ export default function CredentialDetailPage() {
                   Issued by {credential.issuer_name} · {formatDateTime(credential.issued_at)}
                 </CardDescription>
               </div>
-              <Badge variant="success">
-                <KeyRound className="h-3 w-3 mr-1" /> Ed25519 signed
-              </Badge>
+              <div className="flex flex-wrap gap-2 justify-end">
+                <Badge variant="success">
+                  <KeyRound className="h-3 w-3 mr-1" /> Ed25519 signed
+                </Badge>
+                {faceVerified && (
+                  <Badge variant="outline" className="border-success/50 text-success">
+                    <ScanFace className="h-3 w-3 mr-1" /> Aadhaar face verified
+                  </Badge>
+                )}
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -202,12 +239,32 @@ export default function CredentialDetailPage() {
                 </Select>
               </div>
               <Button onClick={onShare} loading={submitting} disabled={selected.size === 0}>
-                <Share2 className="h-4 w-4" /> Generate share link
+                {faceVerified ? (
+                  <>
+                    <Share2 className="h-4 w-4" /> Generate share link
+                  </>
+                ) : (
+                  <>
+                    <ScanFace className="h-4 w-4" /> Verify & share
+                  </>
+                )}
               </Button>
             </div>
+            {!faceVerified && selected.size > 0 && (
+              <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 pt-1">
+                <ScanFace className="h-3 w-3" />
+                Aadhaar face authentication is required before the share link is issued.
+              </p>
+            )}
           </CardContent>
         </Card>
       </main>
+
+      <FaceAuthDialog
+        open={faceAuthOpen}
+        onOpenChange={setFaceAuthOpen}
+        onVerified={onFaceVerified}
+      />
 
       {share && (
         <ShareDialog
