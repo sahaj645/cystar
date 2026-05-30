@@ -5,7 +5,7 @@ expose cryptographic verification compute.
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -66,7 +66,7 @@ def fetch_share(
 @limiter.limit(_settings.rate_limit_verify)
 def verify(
     request: Request,
-    body: VerifyRequest,
+    body: VerifyRequest = Body(...),
     db: Session = Depends(get_db),
 ) -> VerifyResponse:
     """Verify a presentation cryptographically.

@@ -1,7 +1,7 @@
 """Authentication endpoints: register, login, current user."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -22,7 +22,11 @@ _settings = get_settings()
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 @limiter.limit(_settings.rate_limit_auth)
-def register(request: Request, body: RegisterRequest, db: Session = Depends(get_db)) -> TokenResponse:
+def register(
+    request: Request,
+    body: RegisterRequest = Body(...),
+    db: Session = Depends(get_db),
+) -> TokenResponse:
     """Create a holder account and return a JWT."""
     existing = db.query(models.User).filter(models.User.email == body.email).first()
     if existing:
@@ -45,7 +49,11 @@ def register(request: Request, body: RegisterRequest, db: Session = Depends(get_
 
 @router.post("/login", response_model=TokenResponse)
 @limiter.limit(_settings.rate_limit_auth)
-def login(request: Request, body: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
+def login(
+    request: Request,
+    body: LoginRequest = Body(...),
+    db: Session = Depends(get_db),
+) -> TokenResponse:
     """Exchange email + password for a JWT.
 
     Uses a constant-message error to avoid email-enumeration leaks.
