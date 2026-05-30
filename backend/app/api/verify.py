@@ -2,8 +2,12 @@
 
 These endpoints are rate-limited per IP because they're unauthenticated and
 expose cryptographic verification compute.
+
+Note: no ``from __future__ import annotations`` — see app/api/auth.py for the
+explanation. Body parameters need concrete runtime annotations to play nicely
+with slowapi's decorator.
 """
-from __future__ import annotations
+from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
@@ -66,7 +70,7 @@ def fetch_share(
 @limiter.limit(_settings.rate_limit_verify)
 def verify(
     request: Request,
-    body: VerifyRequest = Body(...),
+    body: Annotated[VerifyRequest, Body()],
     db: Session = Depends(get_db),
 ) -> VerifyResponse:
     """Verify a presentation cryptographically.

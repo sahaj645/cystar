@@ -1,5 +1,12 @@
-"""Authentication endpoints: register, login, current user."""
-from __future__ import annotations
+"""Authentication endpoints: register, login, current user.
+
+Note: this module deliberately does NOT use ``from __future__ import annotations``.
+FastAPI inspects function signatures at runtime to wire up Pydantic validation,
+and stringified annotations break that for body parameters when combined with
+slowapi's decorator. The few annotations here are concrete classes, so no future
+import is needed.
+"""
+from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
@@ -24,7 +31,7 @@ _settings = get_settings()
 @limiter.limit(_settings.rate_limit_auth)
 def register(
     request: Request,
-    body: RegisterRequest = Body(...),
+    body: Annotated[RegisterRequest, Body()],
     db: Session = Depends(get_db),
 ) -> TokenResponse:
     """Create a holder account and return a JWT."""
@@ -51,7 +58,7 @@ def register(
 @limiter.limit(_settings.rate_limit_auth)
 def login(
     request: Request,
-    body: LoginRequest = Body(...),
+    body: Annotated[LoginRequest, Body()],
     db: Session = Depends(get_db),
 ) -> TokenResponse:
     """Exchange email + password for a JWT.
