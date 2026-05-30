@@ -74,7 +74,7 @@ export default function IssuePage() {
           <CardHeader>
             <CardTitle>Issue a credential</CardTitle>
             <CardDescription>
-              Add claims as key/value pairs. They'll be salted, hashed into a Merkle tree, and the root signed with Ed25519.
+              Add claims as key/value pairs. They&apos;ll be salted, hashed into a Merkle tree, and the root signed with Ed25519.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">

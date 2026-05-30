@@ -152,9 +152,9 @@ export default function VerifyPage() {
               <KeyRound className="h-3.5 w-3.5 text-primary" /> How this works
             </div>
             <p>
-              Each claim was salted, hashed, and placed in a Merkle tree. The issuer signed the tree's root with Ed25519.
+              Each claim was salted, hashed, and placed in a Merkle tree. The issuer signed the tree&apos;s root with Ed25519.
               The disclosed claims include inclusion proofs that reconstruct the same root, and the signature is checked
-              against the issuer's public key. Any tampered field breaks the proof.
+              against the issuer&apos;s public key. Any tampered field breaks the proof.
             </p>
           </CardContent>
         </Card>
