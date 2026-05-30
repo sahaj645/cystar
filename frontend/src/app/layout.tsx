@@ -1,0 +1,27 @@
+import type { Metadata, Viewport } from "next";
+import { Toaster } from "sonner";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "CyStar — Selective Disclosure",
+  description: "Cryptographic Verifiable Credentials with selective disclosure on Ed25519 + Merkle trees.",
+  applicationName: "CyStar",
+  authors: [{ name: "Sahaj Gaur" }],
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#0b0f1a",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className="dark">
+      <body>
+        {children}
+        <Toaster richColors position="top-right" />
+      </body>
+    </html>
+  );
+}
