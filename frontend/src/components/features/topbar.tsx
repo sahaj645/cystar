@@ -17,14 +17,18 @@ export function Topbar() {
         <nav className="flex items-center gap-1">
           <Button asChild variant="ghost" size="sm">
             <Link href="/dashboard">
-              <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">My credentials</span>
+              <span className="inline-flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline">My credentials</span>
+              </span>
             </Link>
           </Button>
           <Button asChild size="sm">
             <Link href="/issue">
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Issue</span>
+              <span className="inline-flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">Issue</span>
+              </span>
             </Link>
           </Button>
           {user && (

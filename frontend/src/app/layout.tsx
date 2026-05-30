@@ -2,11 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-// Disable static prerendering for the entire app.
-// All pages either use client-side auth (localStorage) or render server-side
-// per request — neither benefits from static generation.
-export const dynamic = "force-dynamic";
-
 export const metadata: Metadata = {
   title: "CyStar — Selective Disclosure",
   description: "Cryptographic Verifiable Credentials with selective disclosure on Ed25519 + Merkle trees.",

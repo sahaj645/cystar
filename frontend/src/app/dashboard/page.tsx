@@ -42,7 +42,9 @@ export default function DashboardPage() {
           </div>
           <Button asChild>
             <Link href="/issue">
-              <Plus className="h-4 w-4" /> Issue new
+              <span className="inline-flex items-center gap-2">
+                <Plus className="h-4 w-4" /> Issue new
+              </span>
             </Link>
           </Button>
         </div>
@@ -114,7 +116,9 @@ function EmptyState() {
         </p>
         <Button asChild className="mt-6">
           <Link href="/issue">
-            <Plus className="h-4 w-4" /> Issue your first credential
+            <span className="inline-flex items-center gap-2">
+              <Plus className="h-4 w-4" /> Issue your first credential
+            </span>
           </Link>
         </Button>
       </CardContent>

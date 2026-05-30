@@ -39,7 +39,9 @@ export default function HomePage() {
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button asChild size="lg">
               <Link href="/register">
-                Create credential <ChevronRight className="h-4 w-4" />
+                <span className="inline-flex items-center gap-2">
+                  Create credential <ChevronRight className="h-4 w-4" />
+                </span>
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
