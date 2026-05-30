@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import { api, type Credential, type ShareResponse, ApiError } from "@/lib/api";
 import { Topbar } from "@/components/features/topbar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -148,72 +147,87 @@ export default function CredentialDetailPage() {
   return (
     <div className="min-h-screen">
       <Topbar />
-      <main className="container py-8 max-w-4xl">
-        <Link href="/dashboard" className="inline-flex items-center gap-1 text-sm text-muted-foreground mb-4 hover:text-foreground">
+      <main className="container py-10 max-w-4xl animate-fade-in">
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground mb-6 hover:text-foreground transition-colors focus-ring rounded"
+        >
           <ArrowLeft className="h-4 w-4" /> Back to credentials
         </Link>
 
         {/* Credential header */}
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <CardTitle>{credential.credential_type}</CardTitle>
-                <CardDescription>
-                  Issued by {credential.issuer_name} · {formatDateTime(credential.issued_at)}
-                </CardDescription>
-              </div>
-              <div className="flex flex-wrap gap-2 justify-end">
-                <Badge variant="success">
-                  <KeyRound className="h-3 w-3 mr-1" /> Ed25519 signed
+        <div className="surface rounded-xl p-7 mb-6">
+          <div className="flex items-start justify-between gap-3 mb-5">
+            <div>
+              <div className="mono-tag mb-3">{credential.credential_type}</div>
+              <h1 className="text-2xl md:text-3xl font-semibold tracking-tighter">
+                {credential.issuer_name}
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Issued {formatDateTime(credential.issued_at)}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-end">
+              <Badge variant="success">
+                <KeyRound className="h-3 w-3 mr-1" /> Ed25519 signed
+              </Badge>
+              {faceVerified && (
+                <Badge variant="outline" className="border-success/40 text-success">
+                  <ScanFace className="h-3 w-3 mr-1" /> Face verified
                 </Badge>
-                {faceVerified && (
-                  <Badge variant="outline" className="border-success/50 text-success">
-                    <ScanFace className="h-3 w-3 mr-1" /> Aadhaar face verified
-                  </Badge>
-                )}
-              </div>
+              )}
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid sm:grid-cols-2 gap-4 text-xs">
-              <Field label="Merkle root" value={shortHash(credential.merkle_root, 12, 8)} mono />
-              <Field label="Issuer key" value={shortHash(credential.issuer_public_key, 12, 8)} mono />
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4 pt-5 border-t border-border/60 text-xs">
+            <Field label="Merkle root" value={shortHash(credential.merkle_root, 14, 10)} mono />
+            <Field label="Issuer key" value={shortHash(credential.issuer_public_key, 14, 10)} mono />
+          </div>
+        </div>
 
         {/* Selective disclosure */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between flex-wrap gap-3">
-              <div>
-                <CardTitle>Selective disclosure</CardTitle>
-                <CardDescription>
-                  Pick which claims to reveal. Hidden ones remain cryptographically committed.
-                </CardDescription>
-              </div>
-              <Button variant="ghost" size="sm" onClick={toggleAll}>
+        <div className="surface rounded-xl p-7">
+          <div className="flex items-start justify-between flex-wrap gap-3 mb-6">
+            <div>
+              <div className="mono-tag mb-3">Selective disclosure</div>
+              <h2 className="text-xl md:text-2xl font-semibold tracking-tight">
+                Choose what to reveal
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1 max-w-md">
+                Hidden claims stay cryptographically bound to the same signature
+                &mdash; nothing about them leaks.
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={toggleAll}>
+              <span className="inline-flex items-center gap-2">
                 {allSelected ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 {allSelected ? "Hide all" : "Reveal all"}
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+              </span>
+            </Button>
+          </div>
+
+          <div className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-2">
               {credential.leaf_order.map((field) => {
                 const checked = selected.has(field);
                 return (
                   <label
                     key={field}
-                    className={`flex items-center gap-3 rounded-lg border p-3 cursor-pointer transition-colors ${
-                      checked ? "border-primary bg-primary/5" : "border-border/50 hover:border-border"
+                    className={`group flex items-center gap-3 rounded-lg border p-3.5 cursor-pointer transition-all ${
+                      checked
+                        ? "border-primary/60 bg-primary/[0.04] shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.15)]"
+                        : "border-border/70 hover:border-border hover:bg-muted/30"
                     }`}
                   >
                     <Checkbox checked={checked} onCheckedChange={() => toggle(field)} />
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium">{field}</div>
-                      <div className="text-xs text-muted-foreground truncate font-mono">
+                      <div className="text-sm font-medium tracking-tight">{field}</div>
+                      <div
+                        className={`text-xs truncate font-mono ${
+                          checked
+                            ? "text-foreground/80"
+                            : "text-muted-foreground/70 italic"
+                        }`}
+                      >
                         {checked ? String(credential.claims[field]) : "hidden until shared"}
                       </div>
                     </div>
@@ -222,9 +236,11 @@ export default function CredentialDetailPage() {
               })}
             </div>
 
-            <div className="grid sm:grid-cols-[1fr_auto] gap-3 items-end pt-2">
+            <div className="mt-6 pt-6 border-t border-border/60 grid sm:grid-cols-[1fr_auto] gap-3 items-end">
               <div className="space-y-2">
-                <Label>Link expires after</Label>
+                <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Link expires after
+                </Label>
                 <Select value={expiryMinutes} onValueChange={setExpiryMinutes}>
                   <SelectTrigger>
                     <SelectValue />
@@ -238,26 +254,31 @@ export default function CredentialDetailPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={onShare} loading={submitting} disabled={selected.size === 0}>
+              <Button
+                onClick={onShare}
+                loading={submitting}
+                disabled={selected.size === 0}
+                size="lg"
+              >
                 {faceVerified ? (
                   <>
                     <Share2 className="h-4 w-4" /> Generate share link
                   </>
                 ) : (
                   <>
-                    <ScanFace className="h-4 w-4" /> Verify & share
+                    <ScanFace className="h-4 w-4" /> Verify &amp; share
                   </>
                 )}
               </Button>
             </div>
             {!faceVerified && selected.size > 0 && (
-              <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 pt-1">
+              <p className="text-[11px] text-muted-foreground/80 flex items-center gap-1.5 mt-3">
                 <ScanFace className="h-3 w-3" />
                 Aadhaar face authentication is required before the share link is issued.
               </p>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </main>
 
       <FaceAuthDialog

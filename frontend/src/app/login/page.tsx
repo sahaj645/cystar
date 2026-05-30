@@ -9,13 +9,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ShieldCheck } from "lucide-react";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
 
 import { api, setToken, ApiError } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 const schema = z.object({
   email: z.string().email("enter a valid email"),
@@ -44,46 +43,82 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4 bg-grid">
-      <div className="w-full max-w-md">
-        <Link href="/" className="flex items-center justify-center gap-2 mb-8 font-semibold text-lg">
-          <ShieldCheck className="h-6 w-6 text-primary" /> CyStar
+    <main className="min-h-screen flex flex-col">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-96 -z-10 hero-glow" />
+
+      <div className="container py-8">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors focus-ring rounded"
+        >
+          <ArrowLeft className="h-4 w-4" /> Back home
         </Link>
-        <Card>
-          <CardHeader>
-            <CardTitle>Sign in</CardTitle>
-            <CardDescription>Welcome back. Access your credentials.</CardDescription>
-          </CardHeader>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="space-y-4">
+      </div>
+
+      <div className="flex-1 flex items-center justify-center px-4 pb-16 animate-fade-in">
+        <div className="w-full max-w-md">
+          <Link href="/" className="flex items-center justify-center gap-2.5 mb-10">
+            <div className="h-7 w-7 rounded-md bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground shadow-[0_0_24px_-6px_hsl(var(--primary)/0.6)]">
+              <ShieldCheck className="h-4 w-4" />
+            </div>
+            <span className="text-lg font-semibold tracking-tight">CyStar</span>
+          </Link>
+
+          <div className="surface rounded-xl p-8">
+            <div className="mb-7">
+              <div className="mono-tag mb-3">Sign in</div>
+              <h1 className="text-2xl font-semibold tracking-tighter">
+                Welcome back
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1.5">
+                Access your verifiable credentials vault.
+              </p>
+            </div>
+
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" autoComplete="email" {...form.register("email")} />
+                <Label htmlFor="email" className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  {...form.register("email")}
+                />
                 {form.formState.errors.email && (
                   <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" autoComplete="current-password" {...form.register("password")} />
+                <Label htmlFor="password" className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Password
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                  {...form.register("password")}
+                />
                 {form.formState.errors.password && (
                   <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
                 )}
               </div>
-            </CardContent>
-            <CardFooter className="flex flex-col gap-3">
-              <Button type="submit" className="w-full" loading={submitting}>
+              <Button type="submit" className="w-full" loading={submitting} size="lg">
                 Sign in
               </Button>
-              <p className="text-sm text-muted-foreground">
-                No account?{" "}
-                <Link href="/register" className="text-primary hover:underline">
-                  Create one
-                </Link>
-              </p>
-            </CardFooter>
-          </form>
-        </Card>
+            </form>
+          </div>
+
+          <p className="text-sm text-muted-foreground text-center mt-6">
+            No account?{" "}
+            <Link href="/register" className="text-primary hover:underline focus-ring rounded">
+              Create one
+            </Link>
+          </p>
+        </div>
       </div>
     </main>
   );

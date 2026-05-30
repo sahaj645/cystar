@@ -2,60 +2,189 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Design tokens.
+ *
+ * The palette is deliberately warm-neutral rather than the default
+ * shadcn cool blue. We anchor the brand in amber + ivory to evoke the
+ * "issued credential / paper certificate" metaphor, paired with deep
+ * graphite for surfaces. Borders are hairlines (8-10% lightness deltas)
+ * so cards feel etched rather than boxy.
+ */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    /* Light theme — not actively used (app boots dark), but kept clean. */
+    --background: 36 30% 98%;
+    --foreground: 24 14% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --primary: 221 83% 53%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 84% 60%;
+    --card-foreground: 24 14% 12%;
+    --muted: 36 16% 95%;
+    --muted-foreground: 24 8% 42%;
+    --primary: 32 95% 56%;
+    --primary-foreground: 24 14% 10%;
+    --secondary: 36 16% 95%;
+    --secondary-foreground: 24 14% 12%;
+    --accent: 36 16% 95%;
+    --accent-foreground: 24 14% 12%;
+    --destructive: 0 72% 50%;
     --destructive-foreground: 0 0% 100%;
-    --success: 142 71% 45%;
+    --success: 152 60% 38%;
     --success-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
-    --radius: 0.625rem;
+    --border: 24 10% 88%;
+    --input: 24 10% 88%;
+    --ring: 32 95% 56%;
+    --radius: 0.5rem;
   }
+
   .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 50%;
-    --destructive-foreground: 210 40% 98%;
-    --success: 142 71% 45%;
-    --success-foreground: 222 47% 11%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 217 91% 60%;
+    /* Surfaces — warm graphite, not pure black */
+    --background: 24 12% 7%;          /* near-black, warm */
+    --foreground: 36 18% 96%;          /* ivory */
+    --card: 24 10% 9%;                 /* card surface */
+    --card-foreground: 36 18% 96%;
+    --muted: 24 8% 14%;
+    --muted-foreground: 30 8% 62%;
+
+    /* Brand — amber */
+    --primary: 36 96% 60%;             /* warm amber */
+    --primary-foreground: 24 14% 8%;
+
+    /* Secondary surfaces */
+    --secondary: 24 8% 12%;
+    --secondary-foreground: 36 18% 96%;
+    --accent: 24 8% 14%;
+    --accent-foreground: 36 18% 96%;
+
+    /* Status */
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 55% 50%;
+    --success-foreground: 24 14% 8%;
+
+    /* Borders — hairline, slightly warmer than surface */
+    --border: 24 8% 18%;
+    --input: 24 8% 18%;
+    --ring: 36 96% 60%;
   }
+
   * { @apply border-border; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+    text-rendering: optimizeLegibility;
+    background-image:
+      radial-gradient(1200px 600px at 50% -200px, hsl(36 96% 60% / 0.06), transparent),
+      radial-gradient(800px 400px at 100% 100%, hsl(36 96% 60% / 0.04), transparent);
   }
+
+  /* Selection */
+  ::selection {
+    background: hsl(var(--primary) / 0.25);
+    color: hsl(var(--foreground));
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.4); }
 }
 
+/* ----------------------------------------------------------------------
+ * Composable surface + texture utilities
+ * --------------------------------------------------------------------*/
 @layer utilities {
+  /* Subtle dotted background for hero / empty states */
   .bg-grid {
-    background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
-    background-size: 24px 24px;
+    background-image:
+      linear-gradient(to right, hsl(var(--border) / 0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.5) 1px, transparent 1px);
+    background-size: 56px 56px;
+    background-position: -1px -1px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black, transparent 70%);
+  }
+
+  /* Subtle ambient glow behind hero text */
+  .hero-glow {
+    background: radial-gradient(ellipse 60% 40% at 50% 50%,
+      hsl(var(--primary) / 0.18),
+      transparent 70%);
+  }
+
+  /* Hairline card with very slight gradient — better than flat fills */
+  .surface {
+    background: linear-gradient(180deg,
+      hsl(var(--card) / 1) 0%,
+      hsl(var(--card) / 0.6) 100%);
+    border: 1px solid hsl(var(--border));
+  }
+
+  .surface-strong {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+  }
+
+  /* Editorial gradient text for hero headlines */
+  .text-gradient {
+    background: linear-gradient(135deg,
+      hsl(var(--foreground)) 0%,
+      hsl(var(--foreground) / 0.65) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .text-gradient-primary {
+    background: linear-gradient(135deg,
+      hsl(36 96% 70%) 0%,
+      hsl(28 95% 55%) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Monospaced metadata pills */
+  .mono-tag {
+    @apply inline-flex items-center gap-1.5 rounded-md border border-border/60
+           bg-muted/40 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider
+           text-muted-foreground;
+  }
+
+  /* Subtle focus ring used on interactive surfaces */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2
+           focus-visible:ring-ring focus-visible:ring-offset-2
+           focus-visible:ring-offset-background;
+  }
+
+  /* Used to fade in content after auth check */
+  .animate-rise {
+    animation: rise 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes rise {
+    0%   { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Slow shimmer for skeletons */
+  .skeleton {
+    background: linear-gradient(90deg,
+      hsl(var(--muted) / 0.6),
+      hsl(var(--muted) / 0.9),
+      hsl(var(--muted) / 0.6));
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite linear;
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
 }
